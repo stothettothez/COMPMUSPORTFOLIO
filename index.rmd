@@ -6,25 +6,65 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(spotifyr)
+library(ggplot2)
 ```
 
-## R Markdown
+2020 was the year of change for every one of us. Traveling has been brought back to a minimum, schools close and working from home became the standard. This last aspect is interesting to me, since working in another environment comes with other habits. I wonder how the music played working at homes differs from music at the office. 
+Luckily Spotify wouldn't be Spotify if it didn't turn every human habit into a playlist. When you search for working from home, you end up with hundreds and hundreds of playlists. I decided to limit this corpus to a special "working from home" folder with all playlists for working from home, created by Spotify. The folder consists of the following playlists:
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r setup, include=FALSE}
+playlist_names <- data.frame("Name" = c("Werkdag FM", "Focus Modus", "To Do List", "Calm & Focused", "Maximum Concentration", "Lo-Fi Beats", 'Lofi Hip-Hop', 'Lush Lofi', 'Instrumental Study', "Jazz Vibes", "Coffee Table Jazz", "Deep Focus"), "Number of songs" = c("250", "59", "100", "102", "180", "450", "100", "190", "285", "300", "143", "194"))
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+as_tibble(playlist_names)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+werkdag_fm <- get_playlist_audio_features("", "37i9dQZF1DX4bw5oBAFpuz")
+focus_modus <- get_playlist_audio_features("", "37i9dQZF1DWVRrbkzYIlbi")
+to_do_list <- get_playlist_audio_features("", "37i9dQZF1DX8sKnLLx9deI")
+calm_focused <- get_playlist_audio_features("", "37i9dQZF1DX9etR9S28cIo")
+maximum_concentration <- get_playlist_audio_features("", "37i9dQZF1DX0wdQKgYFb7Q")
+lofi_beats <- get_playlist_audio_features("", "37i9dQZF1DWWQRwui0ExPn")
+lofi_hiphop <- get_playlist_audio_features("", "37i9dQZF1DX36Xw4IJIVKA")
+lush_lofi <- get_playlist_audio_features("", "37i9dQZF1DXc8kgYqQLMfH")
+instrumental_study <- get_playlist_audio_features("", "37i9dQZF1DX9sIqqvKsjG8")
+jazz_vibes <- get_playlist_audio_features("", "37i9dQZF1DX0SM0LYsmbMT")
+coffee_table_jazz <- get_playlist_audio_features("", "37i9dQZF1DWVqfgj8NZEp1")
+deep_focus <- get_playlist_audio_features("", "37i9dQZF1DWZeKCadgRdKQ")
+
+all_playlists <- bind_rows(
+  werkdag_fm %>% mutate(category = "Werkdag FM"), 
+  focus_modus %>% mutate(category = "Focus Modus"), 
+  to_do_list %>% mutate(category = "To Do List"), 
+  calm_focused %>% mutate(category = "Calm & Focused"), 
+  maximum_concentration %>% mutate(category = "Maximum Concentration"), 
+  lofi_beats %>% mutate(category = "Lofi Beats"), 
+  lofi_hiphop %>% mutate(category = "Lofi hip-hop"), 
+  lush_lofi %>% mutate(category = "Lush Lofi"), 
+  instrumental_study %>% mutate(category = "Instrumental study"), 
+  jazz_vibes %>% mutate(category = "Jazz Vibes"), 
+  coffee_table_jazz %>% mutate(category = "Coffee Table Jazz"), 
+  deep_focus %>% mutate(category = "Deep Focus"))
+```
+
+```{r}
+ggplot(all_playlists, aes(
+  x = energy, 
+  y = loudness, 
+  color = category
+)) + 
+  geom_point(size = 0.1)
+```
+
+
+
+
+
+
+
+
+
