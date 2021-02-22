@@ -2,25 +2,43 @@
 title: "Computational Musicology"
 author: "Stijn van der Zalm"
 date: "2/12/2021"
-output: html_document
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    theme: flatly
 ---
 
-```{r setup, include=FALSE}
+### 2020: What is the best music to be listening to, working from home?
+
+```{r, eval = FALSE}
+remotes::install_github('jaburgoyne/compmus')
+```
+
+```{r setup}
 library(tidyverse)
 library(spotifyr)
+library(plotly)
 library(ggplot2)
+library(compmus)
+library(knitr)
 ```
 
-2020 was the year of change for every one of us. Traveling has been brought back to a minimum, schools close and working from home became the standard. This last aspect is interesting to me, since working in another environment comes with other habits. I wonder how the music played working at homes differs from music at the office. 
-Luckily Spotify wouldn't be Spotify if it didn't turn every human habit into a playlist. When you search for working from home, you end up with hundreds and hundreds of playlists. I decided to limit this corpus to a special "working from home" folder with all playlists for working from home, created by Spotify. The folder consists of the following playlists:
-
-```{r setup, include=FALSE}
-playlist_names <- data.frame("Name" = c("Werkdag FM", "Focus Modus", "To Do List", "Calm & Focused", "Maximum Concentration", "Lo-Fi Beats", 'Lofi Hip-Hop', 'Lush Lofi', 'Instrumental Study', "Jazz Vibes", "Coffee Table Jazz", "Deep Focus"), "Number of songs" = c("250", "59", "100", "102", "180", "450", "100", "190", "285", "300", "143", "194"))
-```
 
 ```{r}
-as_tibble(playlist_names)
+playlist_names <- data.frame("Name" = c("Werkdag FM", "Focus Modus", "To Do List", "Calm & Focused", "Maximum Concentration", "Lo-Fi Beats", 'Lofi Hip-Hop', 'Lush Lofi', 'Instrumental Study', "Jazz Vibes", "Coffee Table Jazz", "Deep Focus"), "Number_of_songs" = c("250", "59", "100", "102", "180", "450", "100", "190", "285", "300", "143", "194"), "Category" = c("Work and Study", "Concentration", "Work and Study", "Concentration", "Concentration", "Lofi", "Lofi", "Lofi", "Work and Study", "Jazz", "Jazz", "Concentration"), row.names = NULL)
+
+kable(playlist_names, caption = "My corpus")
 ```
+
+***
+
+2020 was the year of change for every one of us. Traveling has been brought back to a minimum, schools close and working from home became the standard. As we have all experienced, our computers developed into our community houses, classrooms, living rooms, pubs, clubs, cinemas, restaurants and what not. I believe it has brought us way more knowledge than we could have ever imagined. 
+With the office disappearing out of peoples lives, a lot of regularities change as well. At home there are kids, distractions like hobby's, TV, long overdue home-improvement projects and what not. This combination of impulses change working habits quite much. I wonder to what extent music-listenning changes, being one of those habits. I=Therefore i wonder how the music played working at homes differs from music played at the office. 
+Luckily Spotify wouldn't be Spotify if it didn't turn every human habit into a playlist. When you search for working from home, you end up with hundreds and hundreds of playlists. I decided to limit this corpus to a special "working from home" folder with all playlists for working from home, created by Spotify. The playlists used are shown to the left.
+Categorization that the table shows has been added, to make analysis easier to execute and interpret. The categorization is based on the main functions that the playlists have been formed around or the kind of music it consists of. These are the main categorizations for Spotify playlists. Either a collection of kind of the same sounding music or a collection of music that supports you while doing something in particular. I found these categories to be the reason of existence for these playlists and therefore the main point of view to analyze the playlists
+
+
+### What does working from home mean for Spotify? 
 
 ```{r}
 werkdag_fm <- get_playlist_audio_features("", "37i9dQZF1DX4bw5oBAFpuz")
@@ -37,30 +55,103 @@ coffee_table_jazz <- get_playlist_audio_features("", "37i9dQZF1DWVqfgj8NZEp1")
 deep_focus <- get_playlist_audio_features("", "37i9dQZF1DWZeKCadgRdKQ")
 
 all_playlists <- bind_rows(
-  werkdag_fm %>% mutate(category = "Werkdag FM"), 
-  focus_modus %>% mutate(category = "Focus Modus"), 
-  to_do_list %>% mutate(category = "To Do List"), 
-  calm_focused %>% mutate(category = "Calm & Focused"), 
-  maximum_concentration %>% mutate(category = "Maximum Concentration"), 
-  lofi_beats %>% mutate(category = "Lofi Beats"), 
-  lofi_hiphop %>% mutate(category = "Lofi hip-hop"), 
-  lush_lofi %>% mutate(category = "Lush Lofi"), 
-  instrumental_study %>% mutate(category = "Instrumental study"), 
-  jazz_vibes %>% mutate(category = "Jazz Vibes"), 
-  coffee_table_jazz %>% mutate(category = "Coffee Table Jazz"), 
-  deep_focus %>% mutate(category = "Deep Focus"))
+  werkdag_fm %>% mutate(name = "Werkdag FM", category = "Work and Study"), 
+  focus_modus %>% mutate(name = "Focus Modus", category = "Concentration"), 
+  to_do_list %>% mutate(name = "To Do List", category = "Work and Study"), 
+  calm_focused %>% mutate(name = "Calm & Focused", category = "Concentration"), 
+  maximum_concentration %>% mutate(name = "Maximum Concentration", category = "Concentration"), 
+  lofi_beats %>% mutate(name = "Lofi Beats", category = "Lofi"), 
+  lofi_hiphop %>% mutate(name = "Lofi hip-hop", category = "Lofi"), 
+  lush_lofi %>% mutate(name = "Lush Lofi", category = "Lofi"), 
+  instrumental_study %>% mutate(name = "Instrumental study", category = "Lofi"), 
+  jazz_vibes %>% mutate(name = "Jazz Vibes", category = "Jazz"), 
+  coffee_table_jazz %>% mutate(name = "Coffee Table Jazz", category = "Jazz"), 
+  deep_focus %>% mutate(name = "Deep Focus", category = "Concentration"))
 ```
 
 ```{r}
-ggplot(all_playlists, aes(
-  x = energy, 
-  y = loudness, 
-  color = category
-)) + 
-  geom_point(size = 0.1)
+plot1 <- ggplot(
+  all_playlists, 
+  aes(
+    x = valence, 
+    y = energy, 
+    colour = name
+    )
+  ) + 
+  geom_point(
+    size = 0.5
+    ) + 
+  scale_x_continuous(
+    limits = c(0, 1), 
+    breaks = c(0, 0.50, 1), 
+    minor_breaks = NULL
+    ) + 
+    scale_y_continuous(
+    limits = c(0, 1), 
+    breaks = c(0, 0.50, 1), 
+    minor_breaks = NULL
+    ) +
+  facet_wrap(~category) + 
+  scale_colour_brewer(
+    type = "qual", 
+    palette = 3
+    ) + 
+  theme_light() + 
+  labs(
+    x = "Valence", 
+    y = "Energy", 
+    colour = "Name"
+    ) 
+ggplotly(plot1)
+```
+
+***
+
+The graphs on the left show all the energy and valence levels according to Spotifys API. The playlists are categorized as stated in the previous page. What mainly becomes clear is that Spotify builds playlists for concentration around songs with low energy and low valence levels. In a cautious way you could say the same about the Jazz playlists. However, the songs are more scattered in the plot. The Lofi playlists ar generally low in energy, but more differing when it comes to valence. About the Work and Study playlists nothing really conclusive can be said. Maybe that the songs from To Do List are generally lower in Valence than the songs from Werkdag FM.
+
+
+### The "Lady" in the sheets: What makes Mujer an outlier in Jazz Vibes?
+
+```{r}
+mujer <-
+  get_tidy_audio_analysis("2Gy9GSpzX1axKwHENYDBdw") %>%
+  select(segments) %>% unnest(segments) %>%
+  select(start, duration, pitches)
 ```
 
 
+```{r}
+mujer %>%
+  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) %>%
+  compmus_gather_chroma() %>% 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+```
+
+
+***
+
+One particular outlier is the song Mujer by RLLBTS and Golden Ticket Tapes. This song has a valence of 0.9930 and energy level of 0.83400. Both rather high levels for the majority in the Jazz Vibes playlist. The graph on the right shows the chromagram of this particular song. In this visualization of the pitch classes in this rather short song, there are clear concentrations of energy on D, Eb, F and G. Besides these pitch classes, there is a lot of noise in all the other pitch classes. This chromagram can be better understood when the song is being listened to; the accents on the snare and hi-hats are probably the accents on F and G, since they are relatively stable sounds and are constant throughout the song. Also, around 60 seconds in to the song, some kind of under water-phaser effect is used. Here the drum hits are silent, which is clearly cisible in the chromagram. All the rubbish going on in the other pitch classes is a result of the samples used for this song. Multiple samples play at the same time during the song. These samples were either pulled from  vinyl or processed to sound like they have been. Because of that, the chromagram shows a lot of dispersed energy among pitch classes. The samples are not clean. 
+This does contribute to the song however, the identity of this song suggests an ambient-like, crackly atmosphere. Which is also somethin that could be said about the Lofi playlists. This is not very surprising, since one of the artists, Golden Ticket Tapes, has got songs in both the Lofi Hip-Hop and the Lo-Fi Beats playlist. 
+
+### The meaning of it all: wat works and what does not?
+```{r, out.width = "300px"}
+knitr::include_graphics("pexels-cottonbro-4114739.jpg")
+```
+
+***
+
+Spotify has once again succeeded in forming playlists with corresponding features. I wonder however whether or not the playlists contribute to a better environment while working or studying. Spotify clearly sees a couple of ways in which the playlists could help: The music is instrumental and low in energy(Calm & Focused, Deep Focus, Focus Modus, Instrumental Study and Maximum Concentration), or the music is a bunch of samples, crackling ambiently into your brain (Jazz Vibes, Lofi Beats, Lofi Hip-Hop, Lush Lofi), Jazz music in general(Coffe Table Jazz) or the music is just feel good pop songs that are easy on the ear and not to pungent in their arrangements(To Do List, Werkdag FM). Coming weeks i will further investigate whether any of these aspects contribute to concentration, study or work in general. 
 
 
 
