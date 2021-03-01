@@ -8,8 +8,6 @@ output:
     theme: flatly
 ---
 
-### 2020: What is the best music to be listening to, working from home?
-
 ```{r, eval = FALSE}
 remotes::install_github('jaburgoyne/compmus')
 ```
@@ -21,7 +19,86 @@ library(plotly)
 library(ggplot2)
 library(compmus)
 library(knitr)
+library(fmsb)
+library(dplyr)
 ```
+
+### Why Lofi? 
+
+```{r}
+SAS <-
+  get_tidy_audio_analysis("1qrLuxUFn0rAGErN92uqLH") %>% # Change URI.
+  compmus_align(tatums, segments) %>%                     # Change `bars`
+  select(tatums) %>%                                      #   in all three
+  unnest(tatums) %>%                                      #   of these lines.
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  ) %>%
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  )
+```
+
+```{r}
+SAS %>%
+  compmus_gather_timbre() %>%
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude", title = "Sittin' Around Smokin'") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+```
+
+***
+
+As we have seen in previous page, Lofi playlists have a particular sound, that Spotify thinks would help you with studying. I took an outlier from the Jazz Vibes playlist, which appeared to be more of a Lofi song, since it popped up in one of the Lofi playlists and the ambient, crackly sound identity was quite visible from the chromagram. This sound identity should also be visible from the timbre. That's why i select an outlier from the Lofi graph, which is Sittin' Around Smokin' by sumishii, from the playlist Lo-Fi Beats. Question is whether or not this sound identity is becoming visible from the cepstrogram and/or self-similarity matrices. 
+This cepstrogram shows quite a lot of energy in all of the timbre categories. This suggests a similar conclusion to the one the last page did; Lofi has an crackly, ambient like sound identity. Sounds are not clean, which results in a rumbly end product and can be seen in both chroma- and cepstrograms. 
+
+
+### Sittin' Around Smokin': The song compared to itself
+
+```{r}
+SAS %>%
+  compmus_self_similarity(timbre, "cosine") %>% 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "", title = "Sittin' Around Smokin'")
+```
+
+***
+
+This page shows the Self-Similarity Matrix on Sittin' Around Smokin'. The first thing that this graph shows are the parallel diagonal lines. Listening to the song, these similarity lines can be explained. The song is constructed out of samples, or a particular sample. This sample is used in repetition throughout the song, with small interruptions by vocal ad-lib like elements. The repetition of the sample results in the diagonal lines this graphs shows. Multiple elements of the song are completely the same throughout the song. 
+This adds an element to our definition of Lofi; Ambient, crackly music, constructed of samples with a lot of repetition in it. The arrangements of Lofi songs are therefore rather simple. I suppose this simpleness is an important aspect for Spotify to adapt it in a study/work playlist folder. The repetitiveness and absence of extreme sounds suggest a calm listenning experience and could therefore improve cognitive abilities, according to Spotify. 
+
+### 2020: What is the best music to be listening to, working from home?
+
+
 
 
 ```{r}
@@ -142,16 +219,17 @@ mujer %>%
 ***
 
 One particular outlier is the song Mujer by RLLBTS and Golden Ticket Tapes. This song has a valence of 0.9930 and energy level of 0.83400. Both rather high levels for the majority in the Jazz Vibes playlist. The graph on the right shows the chromagram of this particular song. In this visualization of the pitch classes in this rather short song, there are clear concentrations of energy on D, Eb, F and G. Besides these pitch classes, there is a lot of noise in all the other pitch classes. This chromagram can be better understood when the song is being listened to; the accents on the snare and hi-hats are probably the accents on F and G, since they are relatively stable sounds and are constant throughout the song. Also, around 60 seconds in to the song, some kind of under water-phaser effect is used. Here the drum hits are silent, which is clearly cisible in the chromagram. All the rubbish going on in the other pitch classes is a result of the samples used for this song. Multiple samples play at the same time during the song. These samples were either pulled from  vinyl or processed to sound like they have been. Because of that, the chromagram shows a lot of dispersed energy among pitch classes. The samples are not clean. 
-This does contribute to the song however, the identity of this song suggests an ambient-like, crackly atmosphere. Which is also somethin that could be said about the Lofi playlists. This is not very surprising, since one of the artists, Golden Ticket Tapes, has got songs in both the Lofi Hip-Hop and the Lo-Fi Beats playlist. 
+This does contribute to the song however, the identity of this song suggests an ambient-like, crackly atmosphere. Which is also something that could be said about the Lofi playlists. This is not very surprising, since one of the artists, Golden Ticket Tapes, has got songs in both the Lofi Hip-Hop and the Lo-Fi Beats playlist. 
 
 ### The meaning of it all: wat works and what does not?
-```{r, out.width = "300px"}
-knitr::include_graphics("pexels-cottonbro-4114739.jpg")
-```
+
 
 ***
 
 Spotify has once again succeeded in forming playlists with corresponding features. I wonder however whether or not the playlists contribute to a better environment while working or studying. Spotify clearly sees a couple of ways in which the playlists could help: The music is instrumental and low in energy(Calm & Focused, Deep Focus, Focus Modus, Instrumental Study and Maximum Concentration), or the music is a bunch of samples, crackling ambiently into your brain (Jazz Vibes, Lofi Beats, Lofi Hip-Hop, Lush Lofi), Jazz music in general(Coffe Table Jazz) or the music is just feel good pop songs that are easy on the ear and not to pungent in their arrangements(To Do List, Werkdag FM). Coming weeks i will further investigate whether any of these aspects contribute to concentration, study or work in general. 
+
+
+
 
 
 
