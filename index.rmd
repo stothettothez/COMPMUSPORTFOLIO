@@ -23,85 +23,29 @@ library(fmsb)
 library(dplyr)
 ```
 
-### Away from the Lofi -> All playlists have timbre, how do they relate?
+### Rhythmical analysis of the working from home playlists; is there correlation?
 
 ```{r}
-werkdag_fm2 <- get_playlist_audio_features("", "37i9dQZF1DX4bw5oBAFpuz") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-focus_modus2 <- get_playlist_audio_features("", "37i9dQZF1DWVRrbkzYIlbi") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-to_do_list2 <- get_playlist_audio_features("", "37i9dQZF1DX8sKnLLx9deI") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-calm_focused2 <- get_playlist_audio_features("", "37i9dQZF1DX9etR9S28cIo") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-maximum_concentration2 <- get_playlist_audio_features("", "37i9dQZF1DX0wdQKgYFb7Q") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-lofi_beats2 <- get_playlist_audio_features("", "37i9dQZF1DWWQRwui0ExPn") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-lofi_hiphop2 <- get_playlist_audio_features("", "37i9dQZF1DX36Xw4IJIVKA") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-lush_lofi2 <- get_playlist_audio_features("", "37i9dQZF1DXc8kgYqQLMfH") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-instrumental_study2 <- get_playlist_audio_features("", "37i9dQZF1DX9sIqqvKsjG8") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-jazz_vibes2 <- get_playlist_audio_features("", "37i9dQZF1DX0SM0LYsmbMT") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-coffee_table_jazz2 <- get_playlist_audio_features("", "37i9dQZF1DWVqfgj8NZEp1") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-deep_focus2 <- get_playlist_audio_features("", "37i9dQZF1DWZeKCadgRdKQ") %>% 
-  slice(1:30) %>% 
-  add_audio_analysis()
-```
-```{r}
-all_playlists2 <- bind_rows(
-  werkdag_fm2 %>% mutate(name = "Werkdag FM", category = "Work and Study"), 
-  focus_modus2 %>% mutate(name = "Focus Modus", category = "Concentration"), 
-  to_do_list2 %>% mutate(name = "To Do List", category = "Work and Study"), 
-  calm_focused2 %>% mutate(name = "Calm & Focused", category = "Concentration"), 
-  maximum_concentration2 %>% mutate(name = "Maximum Concentration", category = "Concentration"), 
-  lofi_beats2 %>% mutate(name = "Lofi Beats", category = "Lofi"), 
-  lofi_hiphop2 %>% mutate(name = "Lofi hip-hop", category = "Lofi"), 
-  lush_lofi2 %>% mutate(name = "Lush Lofi", category = "Lofi"), 
-  instrumental_study2 %>% mutate(name = "Instrumental study", category = "Lofi"), 
-  jazz_vibes2 %>% mutate(name = "Jazz Vibes", category = "Jazz"), 
-  coffee_table_jazz2 %>% mutate(name = "Coffee Table Jazz", category = "Jazz"), 
-  deep_focus2 %>% mutate(name = "Deep Focus", category = "Concentration"))
-```
-```{r}
-all_playlists2 %>%
-  mutate(
-    timbre =
-      map(
-        segments,
-        compmus_summarise,
-        timbre,
-        method = "mean"
-      )
-  ) %>%
-  select(category, timbre) %>%
-  compmus_gather_timbre() %>%
-  ggplot(aes(x = basis, y = value, fill = category)) +
-  geom_violin() + 
-  theme_classic() +
-  scale_fill_manual(values = c("#660066", "#f66d7a", "#f6a97a", "#F6e57a")) + 
-  labs(x = "Spotify Timbre Coefficients", y = "", fill = "Category")
+dovidenja <- get_tidy_audio_analysis("71Hs7PGCNa1466R9Wiobo0")
+
+dovidenja %>%
+  tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) %>%
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(x = "Time (s)", y = "Tempo (BPM)", title = "Tempogram Dovidenja") +
+  theme_classic()
 ```
 
 ***
+As the graph in slide 2 shows, the Maximum Concentration playlist contains 1 song with a valence level of 0.0000 and an energy level of 0.0181. This song appears to be underneath most energy levels of the rest of the songs in the playlists, which is around 0.035. This is the song Dovidenja by Darija Horvat (The outlier in the graph on Instrumental Study is actually the same song). The song is a piece for piano and very calm in the musical events in the song. On the left, you see Spotify's attempt to show the tempo throughout the song. An important note to make is that this song is played in a time signature of 6/8. Listening to the song the tempogram is quite easy to interpret.
 
-The graph on the left shows the dispersion of the timbre coefficients among the 4 categories of playlists. For computing reasons all playlists have been brought back to the first 30 songs of the playlist. The dispersion of the different playlists among the coefficients is relatively the same. However, the Concentration and Lofi categories have major dispersions in C02. The playlists from the Concentration and Lofi categories have proven to be correlative before. As the graph in the second slide showed, concerning energy and valence. The rest of this graph also shows that. The dispersions of the 2 categories are the most alike among the other playlists' dispersions. This is clear through most of the other coefficients. 
-I believe Spotify use moderately the same steps for forming Concentration playlists as for Lofi playlists. Soundwise they are both calm, low in volume and apparently easy on the timbre. I think these aspects of music could work for people listening to the music while working or studying. The arrangement of musical aspects in a playlist like these could result in less distraction while working, where jazz or pop-ish playlists, because of timbral tension, high energy levels and high loudness, could result in a higher level of distraction. 
+The song consists of a stable rhythmical part by both left and right hand. The differences between the dispersed tempo parts and the (more or les) stabilized at 100 BPM parts is not particularly clear when listening to the song. I suspect that the dispersion around 5 seconds starts because of a small, syncopated rhythm in the piano. I feel like the small part messes up the observation of the tempo by Spotify. I think this mess-up keeps on until 25 seconds. At the end of these 20 seconds it seems the song only plays half a bar, which results in another mess-up in the right direction; back to 100 BPM. 
+Between 25 and 55 seconds the song becomes less rhythmical and near the 50 seconds it's just chords. That's why the tempo is so strongly defined at 100 BPM around those parts. 
+Then, between 55 and 80 seconds the song is very syncopated again and a clear tempo can't be determined. It feels in a way like a repetition of the first syncopated rhythm between 5 and 25 seconds. However i would need the score to know this for sure. 
+In the last 5 seconds the tempogram shows a big blur with no clear tempo. This is because these last 5 seconds are the result of the piano slowing down in the song and sustaining the last few notes these last 5 seconds. During this sustained chord there is no such thing as rhythm, so it is quite logically that Spotify can't find a proper tempo for this part.
+
+What does seem particular about this song is that the Spotify features function labels this song with a tempo of 0.000 BPM. I think the high level of dispersion of the song and the different parts in the song result in a difficult to determine tempo and Spotify just states it as 0. It's interesting to find out how the algorhythms behind Spotify actually work.
 
 ### 2020: What is the best music to be listening to, working from home?
 
@@ -318,3 +262,83 @@ Spotify has once again succeeded in forming playlists with corresponding feature
 
 
 
+
+### Away from the Lofi -> All playlists have timbre, how do they relate?
+
+```{r}
+werkdag_fm2 <- get_playlist_audio_features("", "37i9dQZF1DX4bw5oBAFpuz") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+focus_modus2 <- get_playlist_audio_features("", "37i9dQZF1DWVRrbkzYIlbi") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+to_do_list2 <- get_playlist_audio_features("", "37i9dQZF1DX8sKnLLx9deI") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+calm_focused2 <- get_playlist_audio_features("", "37i9dQZF1DX9etR9S28cIo") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+maximum_concentration2 <- get_playlist_audio_features("", "37i9dQZF1DX0wdQKgYFb7Q") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+lofi_beats2 <- get_playlist_audio_features("", "37i9dQZF1DWWQRwui0ExPn") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+lofi_hiphop2 <- get_playlist_audio_features("", "37i9dQZF1DX36Xw4IJIVKA") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+lush_lofi2 <- get_playlist_audio_features("", "37i9dQZF1DXc8kgYqQLMfH") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+instrumental_study2 <- get_playlist_audio_features("", "37i9dQZF1DX9sIqqvKsjG8") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+jazz_vibes2 <- get_playlist_audio_features("", "37i9dQZF1DX0SM0LYsmbMT") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+coffee_table_jazz2 <- get_playlist_audio_features("", "37i9dQZF1DWVqfgj8NZEp1") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+deep_focus2 <- get_playlist_audio_features("", "37i9dQZF1DWZeKCadgRdKQ") %>% 
+  slice(1:30) %>% 
+  add_audio_analysis()
+```
+```{r}
+all_playlists2 <- bind_rows(
+  werkdag_fm2 %>% mutate(name = "Werkdag FM", category = "Work and Study"), 
+  focus_modus2 %>% mutate(name = "Focus Modus", category = "Concentration"), 
+  to_do_list2 %>% mutate(name = "To Do List", category = "Work and Study"), 
+  calm_focused2 %>% mutate(name = "Calm & Focused", category = "Concentration"), 
+  maximum_concentration2 %>% mutate(name = "Maximum Concentration", category = "Concentration"), 
+  lofi_beats2 %>% mutate(name = "Lofi Beats", category = "Lofi"), 
+  lofi_hiphop2 %>% mutate(name = "Lofi hip-hop", category = "Lofi"), 
+  lush_lofi2 %>% mutate(name = "Lush Lofi", category = "Lofi"), 
+  instrumental_study2 %>% mutate(name = "Instrumental study", category = "Lofi"), 
+  jazz_vibes2 %>% mutate(name = "Jazz Vibes", category = "Jazz"), 
+  coffee_table_jazz2 %>% mutate(name = "Coffee Table Jazz", category = "Jazz"), 
+  deep_focus2 %>% mutate(name = "Deep Focus", category = "Concentration"))
+```
+```{r}
+all_playlists2 %>%
+  mutate(
+    timbre =
+      map(
+        segments,
+        compmus_summarise,
+        timbre,
+        method = "mean"
+      )
+  ) %>%
+  select(category, timbre) %>%
+  compmus_gather_timbre() %>%
+  ggplot(aes(x = basis, y = value, fill = category)) +
+  geom_violin() + 
+  theme_classic() +
+  scale_fill_manual(values = c("#660066", "#f66d7a", "#f6a97a", "#F6e57a")) + 
+  labs(x = "Spotify Timbre Coefficients", y = "", fill = "Category")
+```
+
+***
+
+The graph on the left shows the dispersion of the timbre coefficients among the 4 categories of playlists. For computing reasons all playlists have been brought back to the first 30 songs of the playlist. The dispersion of the different playlists among the coefficients is relatively the same. However, the Concentration and Lofi categories have major dispersions in C02. The playlists from the Concentration and Lofi categories have proven to be correlative before. As the graph in the second slide showed, concerning energy and valence. The rest of this graph also shows that. The dispersions of the 2 categories are the most alike among the other playlists' dispersions. This is clear through most of the other coefficients. 
+I believe Spotify use moderately the same steps for forming Concentration playlists as for Lofi playlists. Soundwise they are both calm, low in volume and apparently easy on the timbre. I think these aspects of music could work for people listening to the music while working or studying. The arrangement of musical aspects in a playlist like these could result in less distraction while working, where jazz or pop-ish playlists, because of timbral tension, high energy levels and high loudness, could result in a higher level of distraction. 
