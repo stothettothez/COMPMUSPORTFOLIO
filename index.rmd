@@ -174,7 +174,7 @@ ggplotly(plot10)
 
 ***
 
-The histogram on the left shows the count of different levels of instrumentalness in the playlists. What stands out is that most songs have rather high general instrumentalness levels, and that the Work and Study playlists don't contatin too much songs. Within the Work and Study playlists, "To Do List" shows a similar general high level of instrumentalness, but the other playlist "Werkdag FM" shows really low to no levels of instrumentalness. 
+The histogram on the left shows the count of different levels of instrumentalness in the playlists. What stands out is that most songs have rather high general instrumentalness levels, and that the Work and Study playlists don't contatin too much songs. Within the Work and Study playlists, Instrumental Study and "To Do List" shows a similar general high level of instrumentalness, but the other playlist "Werkdag FM" shows really low to no levels of instrumentalness. 
 It seems that this instrumentalness thing is an important attribute to Spotify. Appearantly they believe that instrumental music can enhance working abilities. I would gues that the presence of a (singing) voice could distract you from speaking yourself/typing/reading or any other verbal task that comes with working. 
 If it's not instrumental music you want to listen to, you are bound to choose the "Werkdag FM" playlist. Whihc consists of rather high energy pop songs. I guess familiarity could be an important attribute. When you know or recognize the songs in the playlists, they will seem less distracting to you and could enhance your workflow. 
 The importance of this instrumentalness attribute will be further investigated among genres. 
@@ -301,6 +301,12 @@ SAS %>%
 This page shows the Self-Similarity Matrix on Sittin' Around Smokin'. The first thing that this graph shows are the parallel diagonal lines. Listening to the song, these similarity lines can be explained. The song is constructed out of samples, or a particular sample. This sample is used in repetition throughout the song, with small interruptions by vocal ad-lib like elements. The repetition of the sample results in the diagonal lines this graphs shows. Multiple elements of the song are completely the same throughout the song. 
 This adds an element to our definition of Lofi; Ambient, crackly music, constructed of samples with a lot of repetition in it. The arrangements of Lofi songs are therefore rather simple. I suppose this simpleness is an important aspect for Spotify to adapt it in a study/work playlist folder. The repetitiveness and absence of extreme sounds suggest a calm listenning experience and could therefore improve cognitive abilities, according to Spotify. 
 
+```{=html}
+<object data="https://open.spotify.com/embed/track/1qrLuxUFn0rAGErN92uqLH" width="280" height="140">
+    <embed src="https://open.spotify.com/embed/track/1qrLuxUFn0rAGErN92uqLH" width="280" height="140"></embed>
+</object>
+```
+
 ### Away from the Lofi -> All playlists have timbre, how do they relate?
 
 ```{r}
@@ -395,11 +401,6 @@ dovidenja %>%
   theme_classic()
 ```
 
-```{=html}
-<object data="https://open.spotify.com/embed/track/71Hs7PGCNa1466R9Wiobo0" width="280" height="140">
-    <embed src="https://open.spotify.com/embed/track/71Hs7PGCNa1466R9Wiobo0" width="280" height="140"></embed>
-</object>
-```
 ***
 As the graph in slide 2 shows, the Maximum Concentration playlist contains 1 song with a valence level of 0.0000 and an energy level of 0.0181. This song appears to be underneath most energy levels of the rest of the songs in the playlists, which is around 0.035. This is the song Dovidenja by Darija Horvat (The outlier in the graph on Instrumental Study is actually the same song). The song is a piece for piano and very calm in the musical events in the song. On the left, you see Spotify's attempt to show the tempo throughout the song. An important note to make is that this song is played in a time signature of 6/8. Listening to the song the tempogram is quite easy to interpret.
 
@@ -409,6 +410,12 @@ Then, between 55 and 80 seconds the song is very syncopated again and a clear te
 In the last 5 seconds the tempogram shows a big blur with no clear tempo. This is because these last 5 seconds are the result of the piano slowing down in the song and sustaining the last few notes these last 5 seconds. During this sustained chord there is no such thing as rhythm, so it is quite logically that Spotify can't find a proper tempo for this part.
 
 What does seem particular about this song is that the Spotify features function labels this song with a tempo of 0.000 BPM. I think the high level of dispersion of the song and the different parts in the song result in a difficult to determine tempo and Spotify just states it as 0. It's interesting to find out how the algorhythms behind Spotify actually work.
+
+```{=html}
+<object data="https://open.spotify.com/embed/track/71Hs7PGCNa1466R9Wiobo0" width="280" height="140">
+    <embed src="https://open.spotify.com/embed/track/71Hs7PGCNa1466R9Wiobo0" width="280" height="140"></embed>
+</object>
+```
 
 ### The meaning of it all: wat works and what does not?
 ![Working From Home for some people](jeshoots-com--2vD8lIhdnw-unsplash.jpg)
